@@ -168,23 +168,7 @@
 
       /* HERO */
       .hero {
-        padding: 88px 0 80px;
-      }
-      .eyebrow {
-        display: inline-block;
-        font-size: 12px;
-        font-weight: 500;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--accent-deep);
-        padding: 6px 14px;
-        background: rgba(255, 255, 255, 0.55);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.7);
-        border-radius: 999px;
-        box-shadow: 0 2px 12px rgba(15, 40, 90, 0.04);
-        margin-bottom: 28px;
+        padding: 32px 0 80px;
       }
       h1 {
         font-family: 'Plus Jakarta Sans', sans-serif;
@@ -425,7 +409,6 @@
       </header>
 
       <section class="hero">
-        <span class="eyebrow reveal reveal-2">A UK software studio</span>
         <h1 class="reveal reveal-3">Building<br /><span class="accent">considered</span><br />AI products.</h1>
         <p class="lede reveal reveal-4">Maqia Systems is a small independent studio working at the intersection of AI and the everyday. We build products that are useful, ethical, mission driven. We don't use AI just for the sake of using AI. Our growing portfolio spans consumer health, marketing operations, and knowledge work.</p>
       </section>
@@ -565,17 +548,24 @@
           }
 
           ctx.globalCompositeOperation = 'source-over';
-          var glass = ctx.createRadialGradient(SIZE * 0.32, SIZE * 0.26, 0, SIZE * 0.38, SIZE * 0.32, SIZE * 0.44);
-          glass.addColorStop(0, 'rgba(255,255,255,0.08)');
-          glass.addColorStop(0.45, 'rgba(255,255,255,0.03)');
+          var shadow = ctx.createRadialGradient(SIZE * 0.62, SIZE * 0.78, 0, SIZE * 0.55, SIZE * 0.65, SIZE * 0.50);
+          shadow.addColorStop(0, 'rgba(15,40,90,0.35)');
+          shadow.addColorStop(0.55, 'rgba(15,40,90,0.10)');
+          shadow.addColorStop(1, 'rgba(15,40,90,0)');
+          ctx.fillStyle = shadow;
+          ctx.fillRect(0, 0, SIZE, SIZE);
+
+          var glass = ctx.createRadialGradient(SIZE * 0.32, SIZE * 0.25, 0, SIZE * 0.36, SIZE * 0.30, SIZE * 0.38);
+          glass.addColorStop(0, 'rgba(255,255,255,0.55)');
+          glass.addColorStop(0.30, 'rgba(255,255,255,0.18)');
           glass.addColorStop(1, 'rgba(255,255,255,0)');
           ctx.fillStyle = glass;
           ctx.fillRect(0, 0, SIZE, SIZE);
 
-          var rim = ctx.createRadialGradient(SIZE * 0.5, SIZE * 0.5, SIZE * 0.38, SIZE * 0.5, SIZE * 0.5, SIZE * 0.5);
+          var rim = ctx.createRadialGradient(SIZE * 0.5, SIZE * 0.5, SIZE * 0.40, SIZE * 0.5, SIZE * 0.5, SIZE * 0.5);
           rim.addColorStop(0, 'rgba(255,255,255,0)');
-          rim.addColorStop(0.85, 'rgba(255,255,255,0.05)');
-          rim.addColorStop(1, 'rgba(255,255,255,0.18)');
+          rim.addColorStop(0.85, 'rgba(255,255,255,0.10)');
+          rim.addColorStop(1, 'rgba(255,255,255,0.30)');
           ctx.fillStyle = rim;
           ctx.fillRect(0, 0, SIZE, SIZE);
 
