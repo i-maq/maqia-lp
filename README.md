@@ -14,6 +14,6 @@ Auto-deploys to Cloudflare Pages on push to `main`.
 
 ## Portfolio
 
-- **Nuhah** (live) — halal pregnancy companion at https://nuhah.app
-- **B.O.S.S.** (in development) — AI-native marketing operations
-- **Project Echo** (in development) — continuously learning knowledge platform
+- **Nuhah** (live), halal pregnancy companion at https://nuhah.app
+- **B.O.S.S.** (in development), AI-native marketing operations
+- **Project Echo** (in development), continuously learning knowledge platform
