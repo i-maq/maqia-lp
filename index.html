@@ -548,10 +548,10 @@
           }
 
           ctx.globalCompositeOperation = 'source-over';
-          var shadow = ctx.createRadialGradient(SIZE * 0.62, SIZE * 0.78, 0, SIZE * 0.55, SIZE * 0.65, SIZE * 0.50);
-          shadow.addColorStop(0, 'rgba(15,40,90,0.35)');
-          shadow.addColorStop(0.55, 'rgba(15,40,90,0.10)');
-          shadow.addColorStop(1, 'rgba(15,40,90,0)');
+          var shadow = ctx.createRadialGradient(SIZE * 0.32, SIZE * 0.25, 0, SIZE * 0.32, SIZE * 0.25, SIZE * 0.90);
+          shadow.addColorStop(0, 'rgba(15,40,90,0)');
+          shadow.addColorStop(0.40, 'rgba(15,40,90,0)');
+          shadow.addColorStop(1, 'rgba(15,40,90,0.32)');
           ctx.fillStyle = shadow;
           ctx.fillRect(0, 0, SIZE, SIZE);
 
