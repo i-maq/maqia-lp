@@ -38,7 +38,9 @@
         --on-bg-subtle: rgba(255, 255, 255, 0.62);
         --on-bg-line: rgba(255, 255, 255, 0.20);
         --on-bg-shadow: 0 1px 3px rgba(15, 23, 42, 0.28), 0 0 1px rgba(15, 23, 42, 0.20);
-        --gradient-on-bg: linear-gradient(135deg, #DBEAFE 0%, #FFFFFF 50%, #BFDBFE 100%);
+        /* Saturated cyan-to-sky range. Every stop reads as its own
+           colour against the periwinkle bg, no white wash-out zone. */
+        --gradient-on-bg: linear-gradient(135deg, #67E8F9 0%, #22D3EE 50%, #0EA5E9 100%);
       }
 
       * { box-sizing: border-box; }
@@ -154,7 +156,7 @@
 
       /* HEADER */
       header {
-        padding: 32px 0;
+        padding: 24px 0;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -199,19 +201,22 @@
         letter-spacing: 0.02em;
       }
 
-      /* HERO */
+      /* HERO
+         Compressed for above-the-fold fit on standard desktops. The
+         headline is now single-line, so the font size drops and the
+         12ch wrap constraint is removed. On narrow viewports the
+         headline naturally re-flows to multiple lines. */
       .hero {
-        padding: 32px 0 80px;
+        padding: 16px 0 56px;
       }
       h1 {
         font-family: 'Plus Jakarta Sans', sans-serif;
         font-weight: 800;
-        font-size: clamp(48px, 7vw, 88px);
-        line-height: 1.02;
+        font-size: clamp(32px, 5vw, 60px);
+        line-height: 1.05;
         letter-spacing: -0.035em;
-        margin: 0 0 28px;
+        margin: 0 0 18px;
         color: var(--ink);
-        max-width: 12ch;
       }
       h1 .accent {
         background: var(--gradient);
@@ -221,7 +226,7 @@
         display: inline-block;
       }
       .lede {
-        font-size: clamp(18px, 1.6vw, 21px);
+        font-size: clamp(17px, 1.4vw, 19px);
         line-height: 1.55;
         color: var(--ink-muted);
         max-width: 56ch;
@@ -234,8 +239,8 @@
         display: flex;
         align-items: baseline;
         justify-content: space-between;
-        margin-bottom: 32px;
-        padding-top: 32px;
+        margin-bottom: 24px;
+        padding-top: 24px;
         border-top: 1px solid rgba(15, 40, 90, 0.08);
       }
       .section-head h2 {
@@ -258,7 +263,7 @@
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 20px;
-        padding-bottom: 80px;
+        padding-bottom: 48px;
       }
       @media (max-width: 880px) {
         .products { grid-template-columns: 1fr; }
@@ -271,14 +276,14 @@
         -webkit-backdrop-filter: blur(32px);
         border: 1px solid rgba(255, 255, 255, 0.6);
         border-radius: 20px;
-        padding: 28px 28px 32px;
+        padding: 24px 24px 28px;
         box-shadow:
           0 2px 16px rgba(15, 40, 90, 0.04),
           inset 0 1px 0 rgba(255, 255, 255, 0.75);
         transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
         display: flex;
         flex-direction: column;
-        min-height: 260px;
+        min-height: 240px;
       }
       .card:hover {
         transform: translateY(-4px);
@@ -298,7 +303,7 @@
         padding: 4px 10px;
         border-radius: 999px;
         align-self: flex-start;
-        margin-bottom: 24px;
+        margin-bottom: 20px;
       }
       .status-live {
         background: rgba(34, 197, 94, 0.12);
@@ -332,7 +337,7 @@
       .card h3 {
         font-family: 'Plus Jakarta Sans', sans-serif;
         font-weight: 700;
-        font-size: 26px;
+        font-size: 24px;
         letter-spacing: -0.02em;
         margin: 0 0 4px;
         color: var(--ink);
@@ -343,13 +348,13 @@
         letter-spacing: 0.06em;
         text-transform: uppercase;
         color: var(--ink-subtle);
-        margin: 0 0 20px;
+        margin: 0 0 16px;
       }
       .card p {
-        font-size: 15px;
-        line-height: 1.6;
+        font-size: 14px;
+        line-height: 1.55;
         color: var(--ink-muted);
-        margin: 0 0 24px;
+        margin: 0 0 20px;
         flex-grow: 1;
       }
       .card-link {
@@ -371,7 +376,7 @@
 
       /* FOOTER */
       footer {
-        padding: 40px 0 56px;
+        padding: 24px 0 32px;
         border-top: 1px solid rgba(15, 40, 90, 0.08);
         font-size: 13px;
         line-height: 1.7;
@@ -496,7 +501,7 @@
       </header>
 
       <section class="hero">
-        <h1 class="reveal reveal-3">Building<br /><span class="accent">considered</span><br />AI products.</h1>
+        <h1 class="reveal reveal-3">Building <span class="accent">considered</span> AI products.</h1>
         <p class="lede reveal reveal-4">Maqia Systems is a small independent studio working at the intersection of AI and the everyday. We build products that are useful, ethical, mission driven. We don't use AI just for the sake of using AI. Our growing portfolio spans consumer health, marketing operations, and knowledge work.</p>
       </section>
 
