@@ -52,11 +52,7 @@
 
       ::selection { background: rgba(59, 130, 246, 0.18); color: var(--ink); }
 
-      /* SHADER BACKGROUND
-         Mounts a shaders.com composition (Swirl + FlutedGlass) into
-         .shader-bg-mount via JS. On success, body.shader-bg-active is
-         added, which both hides the aurora fallback below and switches
-         the surrounding text palette to its light variant. */
+      /* SHADER BACKGROUND */
       .shader-bg {
         position: fixed;
         inset: 0;
@@ -136,10 +132,7 @@
         75% { transform: translate(60px, 45px) scale(0.92); }
       }
 
-      /* CONTENT WRAPPER
-         Flex column with min-height: 100vh and footer pushed to the
-         bottom via margin-top:auto, so the page always fills the
-         viewport regardless of content height. No void below footer. */
+      /* CONTENT WRAPPER */
       .wrap {
         position: relative;
         z-index: 1;
@@ -221,11 +214,13 @@
       }
 
       /* WORD CYCLER
-         All words stack in the same grid cell, so the container auto-
-         sizes to the widest word and there's no layout shift on swap.
-         Padding-bottom + negative margin-bottom give the overflow
-         clipping just enough room to clear descenders like the 'y'
-         in "friendly" without affecting layout. */
+         Each word sizes to its own text via width: max-content. JS
+         then sets an explicit width on the .cycle container that
+         matches the active word, with a CSS width transition so the
+         container glides between widths in sync with the swipe. The
+         text after the cycle (" AI products.") rides the container's
+         right edge and stays a consistent space-character distance
+         away regardless of which word is showing. */
       .cycle {
         display: inline-grid;
         vertical-align: baseline;
@@ -233,9 +228,11 @@
         overflow: hidden;
         padding: 0.05em 0.04em 0.18em;
         margin: 0 -0.04em -0.18em;
+        transition: width 0.6s cubic-bezier(0.65, 0, 0.35, 1);
       }
       .cycle-word {
         grid-area: 1 / 1;
+        width: max-content;
         white-space: nowrap;
         transform: translateY(110%);
         opacity: 0;
@@ -393,11 +390,7 @@
       }
       .card-link svg { width: 14px; height: 14px; }
 
-      /* FOOTER
-         margin-top: auto is the sticky-footer trick — pushes the
-         footer to the bottom of the .wrap flex column on tall
-         viewports, while still sitting just below content on short
-         ones. */
+      /* FOOTER */
       footer {
         margin-top: auto;
         padding: 32px 0 40px;
@@ -446,14 +439,9 @@
         .reveal { animation: none !important; opacity: 1; transform: none; }
         .status-live::before { animation: none !important; }
         .brand-mark { animation: none !important; }
-        /* Word cycler stays on the first word; the rotation interval
-           is gated by reduceMotion in JS, so no animation runs. */
       }
 
-      /* LIGHT TEXT PALETTE FOR SHADER BACKGROUND
-         Only applied when body.shader-bg-active is set. When the
-         aurora fallback is showing instead, these rules don't fire
-         and the original dark inks above remain correct. */
+      /* LIGHT TEXT PALETTE FOR SHADER BACKGROUND */
       body.shader-bg-active {
         color: var(--on-bg);
       }
@@ -610,40 +598,60 @@
         );
       }
 
-      // Headline word cycler. Rotates the middle word every 3s with
-      // a slide-up swipe transition. The leaving word slides up and
-      // out, the incoming word slides up from below. After each
-      // transition completes, the just-left word is silently snapped
-      // back to the below position (with transitions disabled for one
-      // frame) so it's ready to come up again on its next turn.
+      // Headline word cycler with dynamic container width. Each word
+      // is sized to its own text via width: max-content, and JS sets
+      // the .cycle container's width to match the active word. CSS
+      // animates the width change in sync with the swipe, so the
+      // trailing " AI products." rides the container's right edge.
       const cycle = document.querySelector('.cycle');
-      if (cycle && !reduceMotion) {
+      if (cycle) {
         const words = Array.from(cycle.querySelectorAll('.cycle-word'));
         let current = 0;
 
-        const tick = () => {
-          const next = (current + 1) % words.length;
-          const leaving = words[current];
-
-          leaving.classList.remove('is-active');
-          leaving.classList.add('is-leaving');
-          words[next].classList.add('is-active');
-
-          current = next;
-
-          // After the transition, reset the leaving word to its default
-          // (translateY(110%), opacity 0) without animating through 0.
-          window.setTimeout(() => {
-            leaving.style.transition = 'none';
-            leaving.classList.remove('is-leaving');
-            // Force a reflow so the transition reset takes effect
-            // before we re-enable transitions.
-            void leaving.offsetWidth;
-            leaving.style.transition = '';
-          }, 650);
+        const syncWidth = () => {
+          const activeWord = words[current];
+          if (!activeWord) return;
+          const rect = activeWord.getBoundingClientRect();
+          if (rect.width > 0) {
+            cycle.style.width = `${rect.width}px`;
+          }
         };
 
-        window.setInterval(tick, 3000);
+        // Wait for fonts to load before measuring, otherwise the first
+        // measurement uses fallback metrics and snaps once Plus Jakarta
+        // Sans arrives.
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(syncWidth);
+        } else {
+          window.addEventListener('load', syncWidth);
+        }
+        // Resync on resize since the headline font-size scales with viewport.
+        window.addEventListener('resize', syncWidth);
+
+        if (!reduceMotion) {
+          const tick = () => {
+            const next = (current + 1) % words.length;
+            const leaving = words[current];
+
+            leaving.classList.remove('is-active');
+            leaving.classList.add('is-leaving');
+            words[next].classList.add('is-active');
+
+            current = next;
+            syncWidth();
+
+            // After the slide finishes, snap the leaving word back to
+            // its default below position without animating through 0.
+            window.setTimeout(() => {
+              leaving.style.transition = 'none';
+              leaving.classList.remove('is-leaving');
+              void leaving.offsetWidth;
+              leaving.style.transition = '';
+            }, 650);
+          };
+
+          window.setInterval(tick, 3000);
+        }
       }
 
       // Page background shader (Swirl + FlutedGlass composition).
@@ -673,6 +681,7 @@
                 refraction: 4,
                 shape: 'rounded',
                 softness: 0,
+                transform: { edges: 'stretch', offsetX: 0.3 },
                 waveAmplitude: 0.1,
                 waveFrequency: 0.5
               }),
