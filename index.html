@@ -44,7 +44,31 @@
 
       ::selection { background: rgba(59, 130, 246, 0.18); color: var(--ink); }
 
-      /* AURORA BACKGROUND */
+      /* SHADER BACKGROUND
+         The new page background. Mounts a shaders.com composition
+         (Swirl + FlutedGlass) into .shader-bg-mount via JS.
+         If the script succeeds, it sets body.shader-bg-active which
+         hides the aurora fallback below. If anything goes wrong
+         loading the shaders package, the class is never added and
+         the aurora stays visible. */
+      .shader-bg {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+      }
+      .shader-bg-mount {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      body.shader-bg-active .aurora {
+        display: none;
+      }
+
+      /* AURORA BACKGROUND (fallback)
+         Original CSS gradient background, retained as a safety net.
+         Hidden when the shader background mounts successfully. */
       .aurora {
         position: fixed;
         inset: 0;
@@ -386,6 +410,13 @@
     </style>
   </head>
   <body>
+    <!-- New shader background, mounts via JS -->
+    <div class="shader-bg" aria-hidden="true">
+      <div class="shader-bg-mount"></div>
+    </div>
+
+    <!-- Original aurora background, kept as a fallback.
+         Hidden via body.shader-bg-active when the shader mounts. -->
     <div class="aurora" aria-hidden="true">
       <div class="aurora-blob aurora-blob-1"></div>
       <div class="aurora-blob aurora-blob-2"></div>
@@ -465,7 +496,8 @@
           "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
           "react-dom": "https://esm.sh/react-dom@18.3.1",
           "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
-          "@paper-design/shaders-react": "https://esm.sh/@paper-design/shaders-react?deps=react@18.3.1,react-dom@18.3.1"
+          "@paper-design/shaders-react": "https://esm.sh/@paper-design/shaders-react?deps=react@18.3.1,react-dom@18.3.1",
+          "shaders/react": "https://esm.sh/shaders/react?deps=react@18.3.1,react-dom@18.3.1"
         }
       }
     </script>
@@ -477,9 +509,10 @@
       const reduceMotion = window.matchMedia
         && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      const mount = document.querySelector('.brand-mark .orb-mount');
-      if (mount) {
-        createRoot(mount).render(
+      // Logo orb (Pearl Drift). Critical, sync import.
+      const orbMount = document.querySelector('.brand-mark .orb-mount');
+      if (orbMount) {
+        createRoot(orbMount).render(
           React.createElement(LiquidMetal, {
             colorBack: '#aaaaac',
             colorTint: '#ffffff',
@@ -496,6 +529,59 @@
             style: { width: '100%', height: '100%' }
           })
         );
+      }
+
+      // Page background shader (Swirl + FlutedGlass composition).
+      // Dynamic import so a CDN failure or package issue cleanly falls
+      // back to the aurora gradient without breaking the orb above.
+      try {
+        const shadersReact = await import('shaders/react');
+        const { Shader, Swirl, FlutedGlass, ChromaFlow, Glass, TiltShift } = shadersReact;
+
+        const bgMount = document.querySelector('.shader-bg-mount');
+        if (bgMount && Shader && Swirl) {
+          createRoot(bgMount).render(
+            React.createElement(
+              Shader,
+              { style: { width: '100%', height: '100%' } },
+              React.createElement(Swirl, {
+                colorA: '#4b6abd',
+                colorB: '#b8dbff',
+                detail: 1.5,
+                speed: reduceMotion ? 0 : 1.2,
+                transform: { scale: 1.34 }
+              }),
+              React.createElement(FlutedGlass, {
+                aberration: 1,
+                angle: 180,
+                frequency: 1,
+                refraction: 4,
+                shape: 'rounded',
+                softness: 0,
+                waveAmplitude: 0.1,
+                waveFrequency: 0.5
+              }),
+              React.createElement(ChromaFlow, { visible: false }),
+              React.createElement(Glass, {
+                blur: 20,
+                center: { x: 0.49, y: 0.44 },
+                fresnelSoftness: 0.87,
+                refraction: 2,
+                shape: { type: 'circleSDF', radius: 0.25 },
+                visible: false
+              }),
+              React.createElement(TiltShift, {
+                center: { x: 0.51, y: 0.37 },
+                intensity: 100,
+                visible: false,
+                width: 1
+              })
+            )
+          );
+          document.body.classList.add('shader-bg-active');
+        }
+      } catch (err) {
+        console.warn('Shader background failed to load, falling back to aurora:', err);
       }
     </script>
   </body>
