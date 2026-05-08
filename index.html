@@ -18,8 +18,6 @@
 
     <style>
       :root {
-        /* Original ink scale, used inside cards and as fallback when
-           the shader background fails to load. */
         --bg: #FAFBFC;
         --ink: #0F172A;
         --ink-muted: #475569;
@@ -28,7 +26,6 @@
         --accent: #3B82F6;
         --accent-light: #38BDF8;
 
-        /* Light scale for text sitting directly on the shader background. */
         --on-bg: #FFFFFF;
         --on-bg-muted: rgba(255, 255, 255, 0.86);
         --on-bg-subtle: rgba(255, 255, 255, 0.62);
@@ -213,14 +210,7 @@
         font-weight: 400;
       }
 
-      /* WORD CYCLER
-         Each word sizes to its own text via width: max-content. JS
-         then sets an explicit width on the .cycle container that
-         matches the active word, with a CSS width transition so the
-         container glides between widths in sync with the swipe. The
-         text after the cycle (" AI products.") rides the container's
-         right edge and stays a consistent space-character distance
-         away regardless of which word is showing. */
+      /* WORD CYCLER */
       .cycle {
         display: inline-grid;
         vertical-align: baseline;
@@ -285,6 +275,10 @@
         .products { grid-template-columns: 1fr; }
       }
 
+      /* CARDS, default (used as aurora fallback)
+         Heavier white frost + dark text reads cleanly on the light
+         aurora gradient. The shader-mode override below replaces all
+         of this with a refined low-opacity glass treatment. */
       .card {
         position: relative;
         background: rgba(255, 255, 255, 0.42);
@@ -296,7 +290,11 @@
         box-shadow:
           0 2px 16px rgba(15, 40, 90, 0.04),
           inset 0 1px 0 rgba(255, 255, 255, 0.75);
-        transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
+        transition:
+          transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+          box-shadow 0.4s ease,
+          border-color 0.4s ease,
+          background 0.4s ease;
         display: flex;
         flex-direction: column;
         min-height: 240px;
@@ -320,6 +318,7 @@
         border-radius: 999px;
         align-self: flex-start;
         margin-bottom: 20px;
+        transition: background 0.4s ease, color 0.4s ease;
       }
       .status-live {
         background: rgba(34, 197, 94, 0.12);
@@ -381,7 +380,7 @@
         font-weight: 500;
         color: var(--accent-deep);
         text-decoration: none;
-        transition: gap 0.2s ease;
+        transition: gap 0.2s ease, color 0.4s ease;
       }
       .card-link:hover { gap: 10px; }
       .card-link.muted {
@@ -474,6 +473,72 @@
       }
       body.shader-bg-active footer .legal strong {
         color: var(--on-bg-muted);
+      }
+
+      /* PRODUCT CARDS ON SHADER BACKGROUND
+         A real glass treatment: low-opacity fill so the swirl breathes
+         through, light hairline border, an inset top highlight that
+         catches the page tone like a real glass edge, and a longer
+         drop-shadow that grounds the cards above the bg without
+         feeling like a 2018 elevation token. Hover lifts the card,
+         brightens the border and inner highlight, and gives the fill
+         a small bump in opacity so the glass feels charged. */
+      body.shader-bg-active .card {
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.04) 100%);
+        border-color: rgba(255, 255, 255, 0.18);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.22),
+          0 1px 0 rgba(255, 255, 255, 0.04),
+          0 24px 48px -20px rgba(15, 23, 42, 0.30);
+      }
+      body.shader-bg-active .card:hover {
+        transform: translateY(-4px);
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.06) 100%);
+        border-color: rgba(255, 255, 255, 0.32);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.32),
+          0 1px 0 rgba(255, 255, 255, 0.08),
+          0 32px 60px -20px rgba(15, 23, 42, 0.40);
+      }
+      body.shader-bg-active .card h3 {
+        color: var(--on-bg);
+      }
+      body.shader-bg-active .card .kind {
+        color: rgba(255, 255, 255, 0.55);
+      }
+      body.shader-bg-active .card p {
+        color: rgba(255, 255, 255, 0.78);
+      }
+      body.shader-bg-active .card-link {
+        color: var(--on-bg);
+      }
+      body.shader-bg-active .card-link.muted {
+        color: rgba(255, 255, 255, 0.50);
+      }
+      /* Status pills, brightened for the dark glass.
+         Tinted bg + matching dot + white label, so the colour reads
+         as a state indicator without dragging the type into a coloured
+         word that can clash with the bg tones behind it. */
+      body.shader-bg-active .status-live {
+        background: rgba(74, 222, 128, 0.14);
+        color: #BBF7D0;
+      }
+      body.shader-bg-active .status-live::before {
+        background: #4ADE80;
+        animation: pulse-dot-bright 2s ease-in-out infinite;
+      }
+      body.shader-bg-active .status-dev {
+        background: rgba(125, 211, 252, 0.14);
+        color: #BAE6FD;
+      }
+      body.shader-bg-active .status-dev::before {
+        background: #7DD3FC;
+      }
+      @keyframes pulse-dot-bright {
+        0%, 100% { box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.30); }
+        50% { box-shadow: 0 0 0 5px rgba(74, 222, 128, 0.08); }
       }
     </style>
   </head>
@@ -598,11 +663,7 @@
         );
       }
 
-      // Headline word cycler with dynamic container width. Each word
-      // is sized to its own text via width: max-content, and JS sets
-      // the .cycle container's width to match the active word. CSS
-      // animates the width change in sync with the swipe, so the
-      // trailing " AI products." rides the container's right edge.
+      // Headline word cycler with dynamic container width.
       const cycle = document.querySelector('.cycle');
       if (cycle) {
         const words = Array.from(cycle.querySelectorAll('.cycle-word'));
@@ -617,15 +678,11 @@
           }
         };
 
-        // Wait for fonts to load before measuring, otherwise the first
-        // measurement uses fallback metrics and snaps once Plus Jakarta
-        // Sans arrives.
         if (document.fonts && document.fonts.ready) {
           document.fonts.ready.then(syncWidth);
         } else {
           window.addEventListener('load', syncWidth);
         }
-        // Resync on resize since the headline font-size scales with viewport.
         window.addEventListener('resize', syncWidth);
 
         if (!reduceMotion) {
@@ -640,8 +697,6 @@
             current = next;
             syncWidth();
 
-            // After the slide finishes, snap the leaving word back to
-            // its default below position without animating through 0.
             window.setTimeout(() => {
               leaving.style.transition = 'none';
               leaving.classList.remove('is-leaving');
@@ -655,8 +710,6 @@
       }
 
       // Page background shader (Swirl + FlutedGlass composition).
-      // Dynamic import so a CDN failure cleanly falls back to the
-      // aurora gradient without breaking the orb above.
       try {
         const shadersReact = await import('shaders/react');
         const { Shader, Swirl, FlutedGlass, ChromaFlow, Glass, TiltShift } = shadersReact;
