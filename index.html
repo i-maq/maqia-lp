@@ -19,8 +19,7 @@
     <style>
       :root {
         /* Original ink scale, used inside cards and as fallback when
-           the shader background fails to load (aurora is light-on-light
-           so dark inks remain correct). */
+           the shader background fails to load. */
         --bg: #FAFBFC;
         --ink: #0F172A;
         --ink-muted: #475569;
@@ -28,19 +27,13 @@
         --accent-deep: #1E3A8A;
         --accent: #3B82F6;
         --accent-light: #38BDF8;
-        --gradient: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 50%, #38BDF8 100%);
 
-        /* Light scale for text sitting directly on the shader background.
-           Only applied via body.shader-bg-active rules at the end of
-           this stylesheet, so the aurora fallback path is unaffected. */
+        /* Light scale for text sitting directly on the shader background. */
         --on-bg: #FFFFFF;
         --on-bg-muted: rgba(255, 255, 255, 0.86);
         --on-bg-subtle: rgba(255, 255, 255, 0.62);
         --on-bg-line: rgba(255, 255, 255, 0.20);
         --on-bg-shadow: 0 1px 3px rgba(15, 23, 42, 0.28), 0 0 1px rgba(15, 23, 42, 0.20);
-        /* Saturated cyan-to-sky range. Every stop reads as its own
-           colour against the periwinkle bg, no white wash-out zone. */
-        --gradient-on-bg: linear-gradient(135deg, #67E8F9 0%, #22D3EE 50%, #0EA5E9 100%);
       }
 
       * { box-sizing: border-box; }
@@ -79,9 +72,7 @@
         display: none;
       }
 
-      /* AURORA BACKGROUND (fallback)
-         Original CSS gradient background, retained as a safety net.
-         Hidden when the shader background mounts successfully. */
+      /* AURORA BACKGROUND (fallback) */
       .aurora {
         position: fixed;
         inset: 0;
@@ -145,18 +136,24 @@
         75% { transform: translate(60px, 45px) scale(0.92); }
       }
 
-      /* CONTENT WRAPPER */
+      /* CONTENT WRAPPER
+         Flex column with min-height: 100vh and footer pushed to the
+         bottom via margin-top:auto, so the page always fills the
+         viewport regardless of content height. No void below footer. */
       .wrap {
         position: relative;
         z-index: 1;
         max-width: 1120px;
         margin: 0 auto;
         padding: 0 32px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
       }
 
       /* HEADER */
       header {
-        padding: 24px 0;
+        padding: 28px 0;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -201,13 +198,9 @@
         letter-spacing: 0.02em;
       }
 
-      /* HERO
-         Compressed for above-the-fold fit on standard desktops. The
-         headline is now single-line, so the font size drops and the
-         12ch wrap constraint is removed. On narrow viewports the
-         headline naturally re-flows to multiple lines. */
+      /* HERO */
       .hero {
-        padding: 16px 0 56px;
+        padding: 24px 0 64px;
       }
       h1 {
         font-family: 'Plus Jakarta Sans', sans-serif;
@@ -215,15 +208,8 @@
         font-size: clamp(32px, 5vw, 60px);
         line-height: 1.05;
         letter-spacing: -0.035em;
-        margin: 0 0 18px;
+        margin: 0 0 20px;
         color: var(--ink);
-      }
-      h1 .accent {
-        background: var(--gradient);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        display: inline-block;
       }
       .lede {
         font-size: clamp(17px, 1.4vw, 19px);
@@ -234,13 +220,46 @@
         font-weight: 400;
       }
 
+      /* WORD CYCLER
+         All words stack in the same grid cell, so the container auto-
+         sizes to the widest word and there's no layout shift on swap.
+         Padding-bottom + negative margin-bottom give the overflow
+         clipping just enough room to clear descenders like the 'y'
+         in "friendly" without affecting layout. */
+      .cycle {
+        display: inline-grid;
+        vertical-align: baseline;
+        position: relative;
+        overflow: hidden;
+        padding: 0.05em 0.04em 0.18em;
+        margin: 0 -0.04em -0.18em;
+      }
+      .cycle-word {
+        grid-area: 1 / 1;
+        white-space: nowrap;
+        transform: translateY(110%);
+        opacity: 0;
+        transition:
+          transform 0.6s cubic-bezier(0.65, 0, 0.35, 1),
+          opacity 0.5s ease 0.05s;
+        will-change: transform, opacity;
+      }
+      .cycle-word.is-active {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .cycle-word.is-leaving {
+        transform: translateY(-110%);
+        opacity: 0;
+      }
+
       /* SECTION HEADER */
       .section-head {
         display: flex;
         align-items: baseline;
         justify-content: space-between;
-        margin-bottom: 24px;
-        padding-top: 24px;
+        margin-bottom: 28px;
+        padding-top: 28px;
         border-top: 1px solid rgba(15, 40, 90, 0.08);
       }
       .section-head h2 {
@@ -263,7 +282,7 @@
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 20px;
-        padding-bottom: 48px;
+        padding-bottom: 64px;
       }
       @media (max-width: 880px) {
         .products { grid-template-columns: 1fr; }
@@ -374,9 +393,14 @@
       }
       .card-link svg { width: 14px; height: 14px; }
 
-      /* FOOTER */
+      /* FOOTER
+         margin-top: auto is the sticky-footer trick — pushes the
+         footer to the bottom of the .wrap flex column on tall
+         viewports, while still sitting just below content on short
+         ones. */
       footer {
-        padding: 24px 0 32px;
+        margin-top: auto;
+        padding: 32px 0 40px;
         border-top: 1px solid rgba(15, 40, 90, 0.08);
         font-size: 13px;
         line-height: 1.7;
@@ -422,16 +446,14 @@
         .reveal { animation: none !important; opacity: 1; transform: none; }
         .status-live::before { animation: none !important; }
         .brand-mark { animation: none !important; }
+        /* Word cycler stays on the first word; the rotation interval
+           is gated by reduceMotion in JS, so no animation runs. */
       }
 
       /* LIGHT TEXT PALETTE FOR SHADER BACKGROUND
-         Only applied when body.shader-bg-active is set (i.e. the new
-         shader background mounted successfully). When the aurora
-         fallback is showing instead, these rules don't fire and the
-         original dark inks above remain correct.
-
-         Card interiors are intentionally untouched here — they sit on
-         their own frosted-glass backing where dark text reads cleanly. */
+         Only applied when body.shader-bg-active is set. When the
+         aurora fallback is showing instead, these rules don't fire
+         and the original dark inks above remain correct. */
       body.shader-bg-active {
         color: var(--on-bg);
       }
@@ -445,11 +467,6 @@
       body.shader-bg-active h1 {
         color: var(--on-bg);
         text-shadow: var(--on-bg-shadow);
-      }
-      body.shader-bg-active h1 .accent {
-        background: var(--gradient-on-bg);
-        -webkit-background-clip: text;
-        background-clip: text;
       }
       body.shader-bg-active .lede {
         color: var(--on-bg-muted);
@@ -478,8 +495,7 @@
       <div class="shader-bg-mount"></div>
     </div>
 
-    <!-- Original aurora background, kept as a fallback.
-         Hidden via body.shader-bg-active when the shader mounts. -->
+    <!-- Original aurora background, kept as a fallback. -->
     <div class="aurora" aria-hidden="true">
       <div class="aurora-blob aurora-blob-1"></div>
       <div class="aurora-blob aurora-blob-2"></div>
@@ -501,7 +517,7 @@
       </header>
 
       <section class="hero">
-        <h1 class="reveal reveal-3">Building <span class="accent">considered</span> AI products.</h1>
+        <h1 class="reveal reveal-3" aria-label="Building considered AI products.">Building <span class="cycle" aria-hidden="true"><span class="cycle-word is-active">considered</span><span class="cycle-word">honest</span><span class="cycle-word">useful</span><span class="cycle-word">human</span><span class="cycle-word">empathetic</span><span class="cycle-word">friendly</span><span class="cycle-word">thoughtful</span></span> AI products.</h1>
         <p class="lede reveal reveal-4">Maqia Systems is a small independent studio working at the intersection of AI and the everyday. We build products that are useful, ethical, mission driven. We don't use AI just for the sake of using AI. Our growing portfolio spans consumer health, marketing operations, and knowledge work.</p>
       </section>
 
@@ -594,9 +610,45 @@
         );
       }
 
+      // Headline word cycler. Rotates the middle word every 3s with
+      // a slide-up swipe transition. The leaving word slides up and
+      // out, the incoming word slides up from below. After each
+      // transition completes, the just-left word is silently snapped
+      // back to the below position (with transitions disabled for one
+      // frame) so it's ready to come up again on its next turn.
+      const cycle = document.querySelector('.cycle');
+      if (cycle && !reduceMotion) {
+        const words = Array.from(cycle.querySelectorAll('.cycle-word'));
+        let current = 0;
+
+        const tick = () => {
+          const next = (current + 1) % words.length;
+          const leaving = words[current];
+
+          leaving.classList.remove('is-active');
+          leaving.classList.add('is-leaving');
+          words[next].classList.add('is-active');
+
+          current = next;
+
+          // After the transition, reset the leaving word to its default
+          // (translateY(110%), opacity 0) without animating through 0.
+          window.setTimeout(() => {
+            leaving.style.transition = 'none';
+            leaving.classList.remove('is-leaving');
+            // Force a reflow so the transition reset takes effect
+            // before we re-enable transitions.
+            void leaving.offsetWidth;
+            leaving.style.transition = '';
+          }, 650);
+        };
+
+        window.setInterval(tick, 3000);
+      }
+
       // Page background shader (Swirl + FlutedGlass composition).
-      // Dynamic import so a CDN failure or package issue cleanly falls
-      // back to the aurora gradient without breaking the orb above.
+      // Dynamic import so a CDN failure cleanly falls back to the
+      // aurora gradient without breaking the orb above.
       try {
         const shadersReact = await import('shaders/react');
         const { Shader, Swirl, FlutedGlass, ChromaFlow, Glass, TiltShift } = shadersReact;
