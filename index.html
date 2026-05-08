@@ -18,6 +18,9 @@
 
     <style>
       :root {
+        /* Original ink scale, used inside cards and as fallback when
+           the shader background fails to load (aurora is light-on-light
+           so dark inks remain correct). */
         --bg: #FAFBFC;
         --ink: #0F172A;
         --ink-muted: #475569;
@@ -26,6 +29,16 @@
         --accent: #3B82F6;
         --accent-light: #38BDF8;
         --gradient: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 50%, #38BDF8 100%);
+
+        /* Light scale for text sitting directly on the shader background.
+           Only applied via body.shader-bg-active rules at the end of
+           this stylesheet, so the aurora fallback path is unaffected. */
+        --on-bg: #FFFFFF;
+        --on-bg-muted: rgba(255, 255, 255, 0.86);
+        --on-bg-subtle: rgba(255, 255, 255, 0.62);
+        --on-bg-line: rgba(255, 255, 255, 0.20);
+        --on-bg-shadow: 0 1px 3px rgba(15, 23, 42, 0.28), 0 0 1px rgba(15, 23, 42, 0.20);
+        --gradient-on-bg: linear-gradient(135deg, #DBEAFE 0%, #FFFFFF 50%, #BFDBFE 100%);
       }
 
       * { box-sizing: border-box; }
@@ -45,12 +58,10 @@
       ::selection { background: rgba(59, 130, 246, 0.18); color: var(--ink); }
 
       /* SHADER BACKGROUND
-         The new page background. Mounts a shaders.com composition
-         (Swirl + FlutedGlass) into .shader-bg-mount via JS.
-         If the script succeeds, it sets body.shader-bg-active which
-         hides the aurora fallback below. If anything goes wrong
-         loading the shaders package, the class is never added and
-         the aurora stays visible. */
+         Mounts a shaders.com composition (Swirl + FlutedGlass) into
+         .shader-bg-mount via JS. On success, body.shader-bg-active is
+         added, which both hides the aurora fallback below and switches
+         the surrounding text palette to its light variant. */
       .shader-bg {
         position: fixed;
         inset: 0;
@@ -406,6 +417,53 @@
         .reveal { animation: none !important; opacity: 1; transform: none; }
         .status-live::before { animation: none !important; }
         .brand-mark { animation: none !important; }
+      }
+
+      /* LIGHT TEXT PALETTE FOR SHADER BACKGROUND
+         Only applied when body.shader-bg-active is set (i.e. the new
+         shader background mounted successfully). When the aurora
+         fallback is showing instead, these rules don't fire and the
+         original dark inks above remain correct.
+
+         Card interiors are intentionally untouched here — they sit on
+         their own frosted-glass backing where dark text reads cleanly. */
+      body.shader-bg-active {
+        color: var(--on-bg);
+      }
+      body.shader-bg-active .brand-name {
+        color: var(--on-bg);
+        text-shadow: var(--on-bg-shadow);
+      }
+      body.shader-bg-active .header-meta {
+        color: var(--on-bg-subtle);
+      }
+      body.shader-bg-active h1 {
+        color: var(--on-bg);
+        text-shadow: var(--on-bg-shadow);
+      }
+      body.shader-bg-active h1 .accent {
+        background: var(--gradient-on-bg);
+        -webkit-background-clip: text;
+        background-clip: text;
+      }
+      body.shader-bg-active .lede {
+        color: var(--on-bg-muted);
+      }
+      body.shader-bg-active .section-head {
+        border-top-color: var(--on-bg-line);
+      }
+      body.shader-bg-active .section-head h2 {
+        color: var(--on-bg);
+      }
+      body.shader-bg-active .section-head .count {
+        color: var(--on-bg-subtle);
+      }
+      body.shader-bg-active footer {
+        color: var(--on-bg-subtle);
+        border-top-color: var(--on-bg-line);
+      }
+      body.shader-bg-active footer .legal strong {
+        color: var(--on-bg-muted);
       }
     </style>
   </head>
