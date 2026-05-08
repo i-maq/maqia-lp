@@ -61,33 +61,6 @@
         height: 100%;
         display: block;
       }
-
-      /* SHADER SCRIM
-         The Swirl shader's brightness varies a lot as it animates —
-         when it morphs to a light periwinkle state, white text and
-         light-glass cards lose contrast against it. A subtle dark
-         gradient sits between the shader and the page content,
-         knocking the bg's lightest moments down enough to keep text
-         readable, while still letting plenty of swirl character
-         through. Lighter at the top (so the headline area still
-         feels open), heavier at the bottom (where the portfolio
-         cards live and need the most contrast). */
-      .shader-scrim {
-        position: fixed;
-        inset: 0;
-        z-index: 0;
-        pointer-events: none;
-        background: linear-gradient(
-          180deg,
-          rgba(15, 23, 42, 0.26) 0%,
-          rgba(15, 23, 42, 0.34) 50%,
-          rgba(15, 23, 42, 0.42) 100%
-        );
-        display: none;
-      }
-      body.shader-bg-active .shader-scrim {
-        display: block;
-      }
       body.shader-bg-active .aurora {
         display: none;
       }
@@ -499,25 +472,32 @@
         color: var(--on-bg-muted);
       }
 
-      /* PRODUCT CARDS ON SHADER BACKGROUND */
+      /* PRODUCT CARDS ON SHADER BACKGROUND
+         Smoked-glass treatment instead of clear glass: a navy-tinted
+         gradient fill provides consistent contrast for the white
+         text inside, so the cards stay readable across every state
+         of the swirl shader (which varies a lot in luminance as it
+         animates). The base .card rule already provides the blur, so
+         visually these are blurred swirl colours muted down by the
+         dark fill, with white type and a hairline white border. */
       body.shader-bg-active .card {
         background:
-          linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.04) 100%);
-        border-color: rgba(255, 255, 255, 0.18);
+          linear-gradient(135deg, rgba(15, 23, 42, 0.22) 0%, rgba(15, 23, 42, 0.36) 100%);
+        border-color: rgba(255, 255, 255, 0.20);
         box-shadow:
-          inset 0 1px 0 rgba(255, 255, 255, 0.22),
+          inset 0 1px 0 rgba(255, 255, 255, 0.20),
           0 1px 0 rgba(255, 255, 255, 0.04),
-          0 24px 48px -20px rgba(15, 23, 42, 0.30);
+          0 24px 48px -20px rgba(15, 23, 42, 0.34);
       }
       body.shader-bg-active .card:hover {
         transform: translateY(-4px);
         background:
-          linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.06) 100%);
-        border-color: rgba(255, 255, 255, 0.32);
+          linear-gradient(135deg, rgba(15, 23, 42, 0.16) 0%, rgba(15, 23, 42, 0.30) 100%);
+        border-color: rgba(255, 255, 255, 0.34);
         box-shadow:
-          inset 0 1px 0 rgba(255, 255, 255, 0.32),
+          inset 0 1px 0 rgba(255, 255, 255, 0.30),
           0 1px 0 rgba(255, 255, 255, 0.08),
-          0 32px 60px -20px rgba(15, 23, 42, 0.40);
+          0 32px 60px -20px rgba(15, 23, 42, 0.42);
       }
       body.shader-bg-active .card h3 {
         color: var(--on-bg);
@@ -535,7 +515,7 @@
         color: rgba(255, 255, 255, 0.50);
       }
       body.shader-bg-active .status-live {
-        background: rgba(74, 222, 128, 0.14);
+        background: rgba(74, 222, 128, 0.16);
         color: #BBF7D0;
       }
       body.shader-bg-active .status-live::before {
@@ -543,7 +523,7 @@
         animation: pulse-dot-bright 2s ease-in-out infinite;
       }
       body.shader-bg-active .status-dev {
-        background: rgba(125, 211, 252, 0.14);
+        background: rgba(125, 211, 252, 0.16);
         color: #BAE6FD;
       }
       body.shader-bg-active .status-dev::before {
@@ -560,11 +540,6 @@
     <div class="shader-bg" aria-hidden="true">
       <div class="shader-bg-mount"></div>
     </div>
-
-    <!-- Dark scrim above the shader, below the content. Only visible
-         when body.shader-bg-active is set, so the aurora fallback
-         path is not affected. -->
-    <div class="shader-scrim" aria-hidden="true"></div>
 
     <!-- Original aurora background, kept as a fallback. -->
     <div class="aurora" aria-hidden="true">
