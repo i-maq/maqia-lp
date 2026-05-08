@@ -61,6 +61,33 @@
         height: 100%;
         display: block;
       }
+
+      /* SHADER SCRIM
+         The Swirl shader's brightness varies a lot as it animates —
+         when it morphs to a light periwinkle state, white text and
+         light-glass cards lose contrast against it. A subtle dark
+         gradient sits between the shader and the page content,
+         knocking the bg's lightest moments down enough to keep text
+         readable, while still letting plenty of swirl character
+         through. Lighter at the top (so the headline area still
+         feels open), heavier at the bottom (where the portfolio
+         cards live and need the most contrast). */
+      .shader-scrim {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background: linear-gradient(
+          180deg,
+          rgba(15, 23, 42, 0.26) 0%,
+          rgba(15, 23, 42, 0.34) 50%,
+          rgba(15, 23, 42, 0.42) 100%
+        );
+        display: none;
+      }
+      body.shader-bg-active .shader-scrim {
+        display: block;
+      }
       body.shader-bg-active .aurora {
         display: none;
       }
@@ -275,10 +302,7 @@
         .products { grid-template-columns: 1fr; }
       }
 
-      /* CARDS, default (used as aurora fallback)
-         Heavier white frost + dark text reads cleanly on the light
-         aurora gradient. The shader-mode override below replaces all
-         of this with a refined low-opacity glass treatment. */
+      /* CARDS, default (used as aurora fallback) */
       .card {
         position: relative;
         background: rgba(255, 255, 255, 0.42);
@@ -475,14 +499,7 @@
         color: var(--on-bg-muted);
       }
 
-      /* PRODUCT CARDS ON SHADER BACKGROUND
-         A real glass treatment: low-opacity fill so the swirl breathes
-         through, light hairline border, an inset top highlight that
-         catches the page tone like a real glass edge, and a longer
-         drop-shadow that grounds the cards above the bg without
-         feeling like a 2018 elevation token. Hover lifts the card,
-         brightens the border and inner highlight, and gives the fill
-         a small bump in opacity so the glass feels charged. */
+      /* PRODUCT CARDS ON SHADER BACKGROUND */
       body.shader-bg-active .card {
         background:
           linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.04) 100%);
@@ -517,10 +534,6 @@
       body.shader-bg-active .card-link.muted {
         color: rgba(255, 255, 255, 0.50);
       }
-      /* Status pills, brightened for the dark glass.
-         Tinted bg + matching dot + white label, so the colour reads
-         as a state indicator without dragging the type into a coloured
-         word that can clash with the bg tones behind it. */
       body.shader-bg-active .status-live {
         background: rgba(74, 222, 128, 0.14);
         color: #BBF7D0;
@@ -547,6 +560,11 @@
     <div class="shader-bg" aria-hidden="true">
       <div class="shader-bg-mount"></div>
     </div>
+
+    <!-- Dark scrim above the shader, below the content. Only visible
+         when body.shader-bg-active is set, so the aurora fallback
+         path is not affected. -->
+    <div class="shader-scrim" aria-hidden="true"></div>
 
     <!-- Original aurora background, kept as a fallback. -->
     <div class="aurora" aria-hidden="true">
