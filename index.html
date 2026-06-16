@@ -337,21 +337,8 @@
         font-size: 13px;
         line-height: 1.7;
         color: var(--ink-subtle);
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 32px;
-        flex-wrap: wrap;
-      }
-      footer .legal { max-width: 60ch; }
-      footer .legal strong { color: var(--ink-muted); font-weight: 500; }
-      footer .meta {
-        text-align: right;
+        text-align: center;
         font-variant-numeric: tabular-nums;
-      }
-      @media (max-width: 640px) {
-        footer { flex-direction: column; gap: 16px; }
-        footer .meta { text-align: left; }
       }
 
       /* ENTRANCE ANIMATIONS */
@@ -409,9 +396,6 @@
       body.shader-bg-active footer {
         color: var(--on-bg-subtle);
         border-top-color: var(--on-bg-line);
-      }
-      body.shader-bg-active footer .legal strong {
-        color: var(--on-bg-muted);
       }
 
       /* PRODUCT CARDS ON SHADER BACKGROUND
@@ -546,13 +530,7 @@
       </div>
 
       <footer>
-        <div class="legal">
-          <strong>Maqia Systems</strong> is a trading name of <strong>Nuhah LTD</strong>, a private limited company registered in England and Wales. Company number 17099290. Registered office in London, United Kingdom.
-        </div>
-        <div class="meta">
-          &copy; 2026 Maqia Systems LTD.<br />
-          All rights reserved
-        </div>
+        &copy; 2026 Maqia Systems LTD.
       </footer>
     </div>
 
